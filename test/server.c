@@ -28,7 +28,7 @@ void add_client(int sockfd, char* name) {
 void print_clients() {
     printf("Current clients:\n");
     for (int i = 0; i < num_clients; i++) {
-        printf("%s\n", clients[i].name);
+        printf("client :: %s\n", clients[i].name);
     }
 }
 
@@ -40,7 +40,7 @@ void error(const char *msg) {
 int main() {
     int sockfd, newsockfd;
     socklen_t clilen;
-    char buffer[BUFFER_SIZE];
+    char name_buf[BUFFER_SIZE], buffer[BUFFER_SIZE];
     struct sockaddr_in serv_addr, cli_addr;
     int n;
 
@@ -70,24 +70,25 @@ int main() {
             error("ERROR reading from socket");
 
         int num1, num2, result;
-        sscanf(buffer, "%d %d", &num1, &num2);
+		  char name[100];
+        sscanf(buffer, "%s %d %d", name,  &num1, &num2);
 		
-		  add_client(newsockfd, buffer);
-        print_clients();
+		  add_client(newsockfd, name);
+        //print_clients();
+			
+		  //printf("\n%d %s\n", num_clients, clients[num_clients-1].name);
+		  if(strcmp(clients[num_clients-1].name, "add") == 0){
+			  result = num1 + num2;
+		  }
 
-        // The first client adds the numbers, the second one multiplies them.
-        static int client_count = 0;
-        if (client_count == 0) {
-            result = num1 + num2;
-        } else {
-            result = num1 * num2;
-        }
-        client_count = (client_count + 1) % MAX_CLIENTS;
+		  if(strcmp(clients[num_clients-1].name, "mul") == 0){
+			  result = num1 * num2;
+		  }
 
-        sprintf(buffer, "%d", result);
-        n = write(newsockfd, buffer, strlen(buffer));
-        if (n < 0) 
-            error("ERROR writing to socket");
+		  sprintf(buffer, "%d", result);
+		  n = write(newsockfd, buffer, strlen(buffer));
+		  if(n < 0)
+			  error("ERROR writing to socket");
 
         close(newsockfd);
     }

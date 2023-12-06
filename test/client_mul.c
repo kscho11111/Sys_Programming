@@ -20,11 +20,11 @@ void error(const char *msg) {
 
 void *send_and_receive(void *arg) {
     int sockfd = *((int *)arg);
-    char buffer[BUFFER_SIZE];
+    char buffer[BUFFER_SIZE], name[100], name_buf[BUFFER_SIZE];
     int num1, num2, n;
 
-    //printf("Enter two numbers: ");
-    //scanf("%d %d", &num1, &num2);
+    printf("Enter client name: ");
+	 scanf("%s", name);
 
 	 printf("Enter first number: ");
 	 scanf("%d", &num1);
@@ -32,7 +32,7 @@ void *send_and_receive(void *arg) {
 	 printf("Enter second number: ");
 	 scanf("%d", &num2);
 
-	 sprintf(buffer, "%d %d", num1, num2);
+	 sprintf(buffer, "%s %d %d", name, num1, num2);
 	 n = write(sockfd, buffer, strlen(buffer));
     if (n < 0) 
         error("ERROR writing to socket");
