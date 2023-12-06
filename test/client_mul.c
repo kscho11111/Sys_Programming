@@ -1,4 +1,4 @@
-// client.c
+//client_mul.c 21011723 chokyungsoo
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
