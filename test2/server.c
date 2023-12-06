@@ -7,42 +7,19 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-#define MAX_CLIENTS 2
 #define BUFFER_SIZE 256
 #define PORT_NO 2222
-
-typedef struct {
-    int sockfd;
-    char name[256];
-} Client;
-
-Client clients[10]; 
-int num_clients = 0;
-
-void add_client(int sockfd, char* name) {
-    clients[num_clients].sockfd = sockfd;
-    strcpy(clients[num_clients].name, name);
-    num_clients++;
-}
-
-void print_clients() {
-    printf("Current clients:\n");
-    for (int i = 0; i < num_clients; i++) {
-        printf("%s\n", clients[i].name);
-    }
-}
 
 void error(const char *msg) {
     perror(msg);
     exit(1);
 }
 
-int main() {
-    int sockfd, newsockfd;
+int main(int argc, char *argv[]) {
+    int sockfd, newsockfd, n;
     socklen_t clilen;
     char buffer[BUFFER_SIZE];
     struct sockaddr_in serv_addr, cli_addr;
-    int n;
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) 
@@ -56,7 +33,7 @@ int main() {
     if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) 
         error("ERROR on binding");
 
-    listen(sockfd, MAX_CLIENTS);
+    listen(sockfd, 5);
     clilen = sizeof(cli_addr);
 
     while (1) {
@@ -71,18 +48,12 @@ int main() {
 
         int num1, num2, result;
         sscanf(buffer, "%d %d", &num1, &num2);
-		
-		  add_client(newsockfd, buffer);
-        print_clients();
 
-        // The first client adds the numbers, the second one multiplies them.
-        static int client_count = 0;
-        if (client_count == 0) {
-            result = num1 + num2;
+        if (newsockfd % 2 == 0) {
+            result = num1 + num2; // 더하기 연산
         } else {
-            result = num1 * num2;
+            result = num1 * num2; // 곱하기 연산
         }
-        client_count = (client_count + 1) % MAX_CLIENTS;
 
         sprintf(buffer, "%d", result);
         n = write(newsockfd, buffer, strlen(buffer));
@@ -95,3 +66,4 @@ int main() {
     close(sockfd);
     return 0; 
 }
+

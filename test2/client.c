@@ -35,7 +35,7 @@ void *send_and_receive(void *arg) {
     if (n < 0) 
         error("ERROR reading from socket");
 
-    printf("Result: %s", buffer);
+    printf("Result: %s\n", buffer);
     return NULL;
 }
 
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
 
     bzero((char *) &serv_addr, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
-    bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr,server->h_length);
+    bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length);
     serv_addr.sin_port = htons(PORT_NO);
 
     if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) 
@@ -69,11 +69,12 @@ int main(int argc, char *argv[]) {
 
     pthread_t thread1, thread2;
     pthread_create(&thread1, NULL, send_and_receive, &sockfd);
-    pthread_create(&thread2, NULL, send_and_receive, &sockfd);
-
     pthread_join(thread1, NULL);
+
+    pthread_create(&thread2, NULL, send_and_receive, &sockfd);
     pthread_join(thread2, NULL);
 
     close(sockfd);
     return 0;
 }
+
