@@ -77,11 +77,11 @@ int main() {
         //print_clients();
 			
 		  //printf("\n%d %s\n", num_clients, clients[num_clients-1].name);
-		  if(strcmp(clients[num_clients-1].name, "add") == 0){
+		  if(strcmp(clients[num_clients-1].name, "./client_add") == 0){
 			  result = num1 + num2;
 		  }
 
-		  if(strcmp(clients[num_clients-1].name, "mul") == 0){
+		  if(strcmp(clients[num_clients-1].name, "./client_mul") == 0){
 			  result = num1 * num2;
 		  }
 

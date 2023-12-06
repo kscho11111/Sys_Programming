@@ -12,6 +12,7 @@
 #define BUFFER_SIZE 256
 #define PORT_NO 2222
 
+char name[100];
 
 void error(const char *msg) {
     perror(msg);
@@ -20,11 +21,11 @@ void error(const char *msg) {
 
 void *send_and_receive(void *arg) {
     int sockfd = *((int *)arg);
-    char buffer[BUFFER_SIZE], name[100], name_buf[BUFFER_SIZE];
+    char buffer[BUFFER_SIZE];
     int num1, num2, n;
 
-    printf("Enter client name: ");
-	 scanf("%s", name);
+    //printf("Enter client name: ");
+	 //scanf("%s", name);
 
 	 printf("Enter first number: ");
 	 scanf("%d", &num1);
@@ -47,7 +48,8 @@ void *send_and_receive(void *arg) {
 }
 
 int main(int argc, char *argv[]) {
-    int sockfd, n;
+	 strcpy(name, argv[0]);
+	 int sockfd, n;
     struct sockaddr_in serv_addr;
     struct hostent *server;
 
@@ -80,13 +82,13 @@ int main(int argc, char *argv[]) {
 	 
 	 if(strcmp(argv[0], "./client_mul") == 0)
 	 {
-		 pthread_create(&thread1, NULL, send_and_receive, &sockfd);
-		 pthread_join(thread1, NULL);
+		 pthread_create(&thread2, NULL, send_and_receive, &sockfd);
+		 pthread_join(thread2, NULL);
 	 }
 
 	 else{
-		 pthread_create(&thread2, NULL, send_and_receive, &sockfd);
-		 pthread_join(thread2, NULL);
+		 pthread_create(&thread1, NULL, send_and_receive, &sockfd);
+		 pthread_join(thread1, NULL);
 	 }
 
 
