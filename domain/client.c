@@ -1,9 +1,7 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <stdlib.h>
 
 #define BUF_SIZE 1024
 #define SOCK_PATH "unix_sock"
@@ -19,8 +17,11 @@ int main()
 {
     int sock;
     struct sockaddr_un serv_adr;
-    ClientInfo client_info;
+    char buf[100] = "Hello, UNIX Domain Socket!";
+	 //char* msg1 = malloc(sizeof(char) * 50);
+	 //char* msg2 = malloc(sizeof(char) * 50);
 
+	 ClientInfo client_info;
     sock = socket(AF_UNIX, SOCK_STREAM, 0);
 
     memset(&serv_adr, 0, sizeof(serv_adr));
@@ -28,8 +29,8 @@ int main()
     strcpy(serv_adr.sun_path, SOCK_PATH);
 
     connect(sock, (struct sockaddr*)&serv_adr, sizeof(serv_adr));
-
-    printf("Enter ID: ");
+    	
+	 printf("Enter ID: ");
     fgets(client_info.id, BUF_SIZE, stdin);
     client_info.id[strcspn(client_info.id, "\n")] = 0; // Remove trailing newline
 
@@ -43,8 +44,13 @@ int main()
     printf("Enter y: ");
     scanf("%d", &client_info.y);
 
-    write(sock, &client_info, sizeof(ClientInfo));
+	 write(sock, &client_info, sizeof(ClientInfo));
 
+	 char *msg = malloc(100);
+	 read(sock, msg, 100);
+	 
+	 printf("%s\n", msg);
+	 
     close(sock);
 
     return 0;

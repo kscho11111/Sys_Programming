@@ -41,7 +41,7 @@ void *send_and_receive(void *arg) {  // 서버로부터 메시지를 보내고 �
     if (n < 0) 
         error("ERROR reading from socket");
 
-    printf("Result: %s %d\n", buffer, strlen(buffer));  // 결과 출력
+    printf("Result: %s\n", buffer);  // 결과 출력
     return NULL;
 }
 

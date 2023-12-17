@@ -128,7 +128,7 @@ int main() {
 				pthread_join(thread_mul, &status);  // 스레드가 끝날 때까지 기다린 후, 반환값을 status에 저장
 
 				int result = (int)(intptr_t)status;  // 반환값을 int 타입으로 변환
-				//printf("Result: %d\n", result);
+				printf("Result: %d\n", result);
 				
 				sprintf(buffer, "%d", result);
 				buffer[strlen(buffer)] = NULL;
