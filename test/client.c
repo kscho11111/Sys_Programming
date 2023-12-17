@@ -46,8 +46,11 @@ int main()
 
 	 write(sock, &client_info, sizeof(ClientInfo));
 
-	 read(sock, msg2, sizeof(msg1));
-	 read(sock, msg1, sizeof(msg2));
+	 read(sock, msg1, 50);
+    read(sock, msg2, 50);
+	 
+	 //read(sock, msg1, sizeof(msg1));
+	 //read(sock, msg2, sizeof(msg2));
 
 	 printf("%s\n", msg1);
 	 printf("%s\n", msg2);

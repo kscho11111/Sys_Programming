@@ -16,44 +16,29 @@ typedef struct {
 
 void *login_handler(void *arg) {
     int result;
-	 char* serv_msg = malloc(sizeof(char) * 50);
-	 ClientInfo *info = (ClientInfo *)arg;
-
-	 printf("ID: %s, PW: %s\n", info->id, info->pw);
-	 
-	 if(info->id == "kscho1" && info->pw == "010216"){
-	 	strcpy(serv_msg,"login completed!");
-		printf("login completed!\n");
-		result = 0;
-	 }
-	 
-	 else{
-		 strcpy(serv_msg,"login failed!");
-		 printf("login failed!\n");
-		 result = 1;
-	 }
-
-	 //printf("%s\n", serv_msg);
-
-    //write(clnt_sock, serv_msg, sizeof(serv_msg));
-
-	 return (void*)(intptr_t)result;
+    ClientInfo *info = (ClientInfo *)arg;
+    
+    printf("ID: %s, PW: %s\n", info->id, info->pw);
+    
+    if(strcmp(info->id, "kscho1") == 0 && strcmp(info->pw, "010216") == 0){
+        printf("login completed!\n");
+        result = 0;
+    } else {
+        printf("login failed!\n");
+        result = 1;
+    }
+    return (void*)(intptr_t)result;
 }
 
 void *calc_handler(void *arg) {
-    char* serv_msg = malloc(sizeof(char) * 50);
-	 ClientInfo *info = (ClientInfo *)arg;
-	 
-	 printf("x: %d, y: %d\n", info->x, info->y); 
-
+    ClientInfo *info = (ClientInfo *)arg;
+    printf("x: %d, y: %d\n", info->x, info->y); 
     int result = pow(info->x, info->y);
-	 sprintf(serv_msg, "Result of calculation is: %d", result);
-    printf("Result of calculationis: %d\n", result);
-
-	 //write(clnt_sock, serv_msg, sizeof(serv_msg));
-
-    return (void*)(intptr_t)result;
+    printf("Result of calculation is: %d\n", result);
+    
+	 return (void*)(intptr_t)result;
 }
+
 
 int main()
 {
@@ -80,32 +65,30 @@ int main()
     pthread_create(&login_thread, NULL, login_handler, (void *)&client_info);
     pthread_create(&calc_thread, NULL, calc_handler, (void *)&client_info);
 
-	 void* msg1;
-	 void* msg2;
+	 void* thread_return;
+    int login_result, calc_result;
 
-    pthread_join(login_thread, &msg1);
-    pthread_join(calc_thread, &msg2);
+    pthread_join(login_thread, &thread_return);
+    login_result = (int)(intptr_t)thread_return;
+    
+	 pthread_join(calc_thread, &thread_return);
+    calc_result = (int)(intptr_t)thread_return;
 
-	 int res1 = (int)(intptr_t)msg1;
-	 int res2 = (int)(intptr_t)msg2;
+	 //printf("login res : %d, calcul res : %d\n", login_result, calc_result);
+    char msg1[50], msg2[50];
+    
+	 if(!login_result)
+		 strcpy(msg1, "login successed!");
+	 else
+		 strcpy(msg1, "login failed...");
+    
+	 sprintf(msg2, "Result of calculation is %d", calc_result);
 
-	 sprintf(msg1, "login : %d", res1);
-	 sprintf(msg2, "Result of calculation is %d", res2);
+	 //printf("%s\n%s\n", msg1, msg2);
 
-	 //msg1[strlen(msg1)] = NULL;
-	 //msg2[strlen(msg2)] = NULL;
-
-	 //sprintf(buffer, "%d", result);
-	 //buffer[strlen(buffer)] = NULL;
-
-	 //write(clnt_sock, buffer, strlen(buffer)+1);
-	 //printf("%d %d\n", sizeof(msg1), sizeof(msg2));
-
-	 write(clnt_sock, msg1, sizeof(msg1));
-	 write(clnt_sock, msg2, sizeof(msg2));
-
-	 //char serv_msg[] = "Hello from server!";
-	 //write(clnt_sock, serv_msg, sizeof(serv_msg));
+    write(clnt_sock, msg1, strlen(msg1)+1);
+    write(clnt_sock, msg2, strlen(msg2)+1);
+    write(clnt_sock, msg1, strlen(msg1)+1);
 
     close(clnt_sock);
     close(serv_sock);
