@@ -7,9 +7,9 @@
 #include <sys/un.h>
 #include <netinet/in.h>
 
-#define MAX_CLIENTS 2
-#define BUFFER_SIZE 256 
-#define PORT_NO 2222
+#define MAX_CLIENTS 2    // 최대 클라이언트 수를 2로 지정
+#define BUFFER_SIZE 256  // 버퍼 크기를 256으로 지정
+#define PORT_NO 2222     // 포트 번호를 2222로 지정
 #define BUF_SIZE 1024
 #define SOCK_PATH "unix_sock"
 
@@ -33,25 +33,25 @@ void add_client(int sockfd, char* name) {  // 새 클라이언트 추가 함수
 }
 
 void* add_thread(void* arg) {
-    numbers* nums = (numbers*)arg;
-    int result = nums->a + nums->b;
+    numbers* nums = (numbers*)arg;    // 구조체 선언
+    int result = nums->a + nums->b;   // result에 결과값 저장
 
-	 printf("First input is : %d\n", nums->a);
+	 printf("First input is : %d\n", nums->a);  // 입력 값 및 result 값 출력
 	 printf("Second input is : %d\n", nums->b);
 	 printf("Result!: %d\n", result);
-
-	 return (void*)(intptr_t)result;
+ 
+	 return (void*)(intptr_t)result;             // result값 반환
 }
 
 void* mul_thread(void* arg){
-	numbers* nums = (numbers*)arg;
-	int result = nums->a * nums->b;
+	numbers* nums = (numbers*)arg;             // 구조체 선언
+	int result = nums->a * nums->b;		   // result에 결과값 저장
 
-	printf("First input is : %d\n", nums->a);
+	printf("First input is : %d\n", nums->a);  // 입력 값 및 result 값 출력
 	printf("Second input is : %d\n", nums->b);
 	printf("Result: %d\n", result);
 
-	return (void*)(intptr_t)result;
+	return (void*)(intptr_t)result;             //result 값 반환
 }
 
 void error(const char *msg) {  // 오류 메시지 출력 후 프로그램 종료 함수
@@ -59,34 +59,34 @@ void error(const char *msg) {  // 오류 메시지 출력 후 프로그램 종�
     exit(1);
 }
 
-typedef struct {
+typedef struct {        //client의 정보를 저장하는 구조체 선언
     char id[BUF_SIZE];
     char pw[BUF_SIZE];
     int x;
     int y;
 } ClientInfo;
 
-void *login_handler(void *arg) {
+void *login_handler(void *arg) {                // login의 여부를 정하는 함수
     int result;
-    ClientInfo *info = (ClientInfo *)arg;
+    ClientInfo *info = (ClientInfo *)arg;       //client의 정보를 저장한 구조체 선언
 
-    printf("ID: %s, PW: %s\n", info->id, info->pw);
+    printf("ID: %s, PW: %s\n", info->id, info->pw); // id와 pw를 출력
 
-    if(strcmp(info->id, "kscho1") == 0 && strcmp(info->pw, "010216") == 0){
-        printf("login completed!\n");
+    if(strcmp(info->id, "kscho1") == 0 && strcmp(info->pw, "010216") == 0){ //id와 pw가 일치하면 0 저장
+        printf("login completed!\n");                               // 서버 화면에 login completed 출력
         result = 0;
-    } else {
+    } else {                                         // 불일치 하면 login failed 출력
         printf("login failed!\n");
         result = 1;
     }
     return (void*)(intptr_t)result;
 }
 
-void *calc_handler(void *arg) {
+void *calc_handler(void *arg) {                      // 계산을 해주는 함수
     ClientInfo *info = (ClientInfo *)arg;
-    printf("x: %d, y: %d\n", info->x, info->y);
+    printf("x: %d, y: %d\n", info->x, info->y);      // 입력받은 인자 출력
     int result = pow(info->x, info->y);
-    printf("Result of calculation is: %d\n", result);
+    printf("Result of calculation is: %d\n", result); // 결과값 저장 및 출력
 
 	 return (void*)(intptr_t)result;
 }
@@ -179,72 +179,73 @@ void *internet_socket_server(void *arg) {
 }
 
 void *domain_socket_server(void *arg) {
-	int serv_sock, clnt_sock;
-    struct sockaddr_un serv_adr, clnt_adr;
-    socklen_t clnt_adr_sz;
+    int serv_sock, clnt_sock;			// 파일 디스크립터를 저장할 변수 선언
+    struct sockaddr_un serv_adr, clnt_adr;	// 주소를 저장할 구조체
+    socklen_t clnt_adr_sz;			//구조체의 크기를 저장
     char buf[100];
 
-	 ClientInfo client_info;
-    serv_sock = socket(AF_UNIX, SOCK_STREAM, 0);
+    ClientInfo client_info;			// 구조체 선언
+    serv_sock = socket(AF_UNIX, SOCK_STREAM, 0); 	// UNIX 도메인 스트림 소켓 생성
     memset(&serv_adr, 0, sizeof(serv_adr));
     serv_adr.sun_family = AF_UNIX;
     strcpy(serv_adr.sun_path, SOCK_PATH);
 
-    bind(serv_sock, (struct sockaddr*)&serv_adr, sizeof(serv_adr));
-    listen(serv_sock, 5);
+    bind(serv_sock, (struct sockaddr*)&serv_adr, sizeof(serv_adr)); // 소켓 바인딩
+    listen(serv_sock, 5);			// 소켓을 리스닝 상태로 바꾸기
 
 	 while(1){
 
     	 clnt_adr_sz = sizeof(clnt_adr);
     	 clnt_sock = accept(serv_sock, (struct sockaddr*)&clnt_adr, &clnt_adr_sz);
 
-    	 read(clnt_sock, &client_info, sizeof(ClientInfo));
+    	 read(clnt_sock, &client_info, sizeof(ClientInfo)); // 클라이언트로부터 정보 가져오기
 
-	 	 pthread_t login_thread, calc_thread;
-    	 pthread_create(&login_thread, NULL, login_handler, (void *)&client_info);
+	 	 pthread_t login_thread, calc_thread; 		// thread 생성
+    	 pthread_create(&login_thread, NULL, login_handler, (void *)&client_info); // 함수 실행 
     	 pthread_create(&calc_thread, NULL, calc_handler, (void *)&client_info);
 
-	 	 void* thread_return;
+	 void* thread_return;		//반환값을 저장할 변수 선언
     	 int login_result, calc_result;
 
-    	 pthread_join(login_thread, &thread_return);
+    	 pthread_join(login_thread, &thread_return);	// 반환 값 받고 int형으로 바꾸기
     	 login_result = (int)(intptr_t)thread_return;
 
-	 	 pthread_join(calc_thread, &thread_return);
+	 pthread_join(calc_thread, &thread_return);	//반환 값 받고 int 형으로 바꾸기
     	 calc_result = (int)(intptr_t)thread_return;
 
 	  	 char msg1[50], msg2[50];
 
-	  	 if(!login_result)
+	  	 if(!login_result)	//로그인 성공 시 login successed 저장
 			 strcpy(msg1, "login successed!\n");
-		 else
+		 else			// 로그인 실패 시 login failed 저장
 			 strcpy(msg1, "login failed...\n");
 
-		 sprintf(msg2, "Result of calculation is %d", calc_result);
+		 sprintf(msg2, "Result of calculation is %d", calc_result); //계산의 결과 저장
 
-		 char *msg = malloc(strlen(msg1) + strlen(msg2) + 3);
+		 char *msg = malloc(strlen(msg1) + strlen(msg2) + 3); // 문자열을 저장할 변수 선언
 
-		 sprintf(msg, "%s%s", msg1, msg2);
+		 sprintf(msg, "%s%s", msg1, msg2);	// 두 문자열 합치기
 
-	 	write(clnt_sock, msg, strlen(msg)+3);
+	 	write(clnt_sock, msg, strlen(msg)+3); 	// 클라이언트로 보내기
 
-	    close(clnt_sock);
+	    close(clnt_sock);		//클라이언트 소켓 닫기
 	 }
 
-	 close(serv_sock);
+	 close(serv_sock);		// 서버 소켓 닫기
 	 unlink(SOCK_PATH);
 
     return 0;
 }
 
 int main(){
-	 pthread_t internet_thread, domain_thread;
-
+    pthread_t internet_thread, domain_thread; // 2개의 thread 생성
+					// 각각 internet socket과 domain socket 을 실행
     pthread_create(&internet_thread, NULL, internet_socket_server, NULL);
     pthread_create(&domain_thread, NULL, domain_socket_server, NULL);
 
-    pthread_join(internet_thread, NULL);
+    pthread_join(internet_thread, NULL);	// 소켓 닫기
     pthread_join(domain_thread, NULL);
 
 	return 0;
 }
+
