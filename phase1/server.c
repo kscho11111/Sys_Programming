@@ -31,13 +31,6 @@ void add_client(int sockfd, char* name) {  // 새 클라이언트 추가 함수
     num_clients++;  // 클라이언트 수 증가
 }
 
-void print_clients() {  // 현재 연결된 클라이언트의 정보 출력
-    printf("Current clients:");
-    for (int i = 0; i < num_clients; i++) {
-        printf("client :: %s", clients[i].name);
-    }
-}
-
 void* add_thread(void* arg) {
     numbers* nums = (numbers*)arg;
     int result = nums->a + nums->b;
