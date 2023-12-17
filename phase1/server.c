@@ -1,4 +1,4 @@
-/server.c 21011723 조경수
+//server.c 21011723 조경수
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -117,21 +117,31 @@ int main() {
 				void* status;
 				pthread_join(thread_add, &status);  // 스레드가 끝날 때까지 기다린 후, 반환값을 status에 저장
 
+				int result = (int)(intptr_t)status;
+				sprintf(buffer, "%d", result);
+				buffer[strlen(buffer)] = NULL;
+				n = write(newsockfd, buffer, strlen(buffer)+1);
+		  }
+
+        if(strcmp(clients[num_clients-1].name, "./client_mul") == 0){  // 클라이언트 이름이 "./client_mul"이면
+            pthread_t thread_mul;
+
+				if (pthread_create(&thread_mul, NULL, mul_thread, &nums) != 0) {
+					perror("Failed to create thread");
+					return -1;
+				}
+
+				void* status;
+				pthread_join(thread_mul, &status);  // 스레드가 끝날 때까지 기다린 후, 반환값을 status에 저장
+
 				int result = (int)(intptr_t)status;  // 반환값을 int 타입으로 변환
 				//printf("Result: %d\n", result);
 				
 				sprintf(buffer, "%d", result);
 				buffer[strlen(buffer)] = NULL;
 				n = write(newsockfd, buffer, strlen(buffer)+1);
-				printf("\n%d\n", strlen(buffer));
 		  }
 
-        if(strcmp(clients[num_clients-1].name, "./client_mul") == 0){  // 클라이언트 이름이 "./client_mul"이면
-            result = num1 * num2;  // 두 숫자를 곱함
-        }
-
-        sprintf(buffer, "%d", result);  // 결과를 버퍼에 저장
-        n = write(newsockfd, buffer, strlen(buffer));  // 결과를 클라이언트에 전송
         if(n < 0)
             error("ERROR writing to socket");
 
