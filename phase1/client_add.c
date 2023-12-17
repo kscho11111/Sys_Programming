@@ -74,18 +74,7 @@ int main(int argc, char *argv[]) {
     if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)  // 서버에 연결
         error("ERROR connecting");
 
-    pthread_t thread1, thread2;  // 스레드 두 개 생성
-
-    if(strcmp(argv[0], "./client_add") == 0)  // argv[0]이 "./client_add"이면 스레드1 실행
-    {
-        pthread_create(&thread1, NULL, send_and_receive, &sockfd);
-        pthread_join(thread1, NULL);
-    }
-
-    else{  // 그 외의 경우에는 스레드2 실행
-        pthread_create(&thread2, NULL, send_and_receive, &sockfd);
-        pthread_join(thread2, NULL);
-    }
+	 send_and_receive(&sockfd);
 
     close(sockfd);  // 소켓 닫기
     return 0;
