@@ -78,6 +78,9 @@ int main() {
             
         if(strcmp(clients[num_clients-1].name, "./client_add") == 0){  // 클라이언트 이름이 "./client_add"이면
             result = num1 + num2;  // 두 숫자를 더함
+				printf("First input is : %d\n", num1);
+				printf("Second input is : %d\n", num2);
+				printf("Output is : %d\n", result);
         }
 
         if(strcmp(clients[num_clients-1].name, "./client_mul") == 0){  // 클라이언트 이름이 "./client_mul"이면
