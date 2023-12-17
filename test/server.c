@@ -56,42 +56,46 @@ int main()
     bind(serv_sock, (struct sockaddr*)&serv_adr, sizeof(serv_adr));
     listen(serv_sock, 5);
 
-    clnt_adr_sz = sizeof(clnt_adr);
-    clnt_sock = accept(serv_sock, (struct sockaddr*)&clnt_adr, &clnt_adr_sz);
+	 while(1){
 
-    read(clnt_sock, &client_info, sizeof(ClientInfo));
+    	 clnt_adr_sz = sizeof(clnt_adr);
+    	 clnt_sock = accept(serv_sock, (struct sockaddr*)&clnt_adr, &clnt_adr_sz);
 
-	 pthread_t login_thread, calc_thread;
-    pthread_create(&login_thread, NULL, login_handler, (void *)&client_info);
-    pthread_create(&calc_thread, NULL, calc_handler, (void *)&client_info);
+    	 read(clnt_sock, &client_info, sizeof(ClientInfo));
 
-	 void* thread_return;
-    int login_result, calc_result;
+	 	 pthread_t login_thread, calc_thread;
+    	 pthread_create(&login_thread, NULL, login_handler, (void *)&client_info);
+    	 pthread_create(&calc_thread, NULL, calc_handler, (void *)&client_info);
 
-    pthread_join(login_thread, &thread_return);
-    login_result = (int)(intptr_t)thread_return;
+	 	 void* thread_return;
+    	 int login_result, calc_result;
+
+    	 pthread_join(login_thread, &thread_return);
+    	 login_result = (int)(intptr_t)thread_return;
     
-	 pthread_join(calc_thread, &thread_return);
-    calc_result = (int)(intptr_t)thread_return;
+	 	 pthread_join(calc_thread, &thread_return);
+    	 calc_result = (int)(intptr_t)thread_return;
 
-	 char msg1[50], msg2[50];
+	  	 char msg1[50], msg2[50];
     
-	 if(!login_result)
-		 strcpy(msg1, "login successed!\n");
-	 else
-		 strcpy(msg1, "login failed...\n");
+	  	 if(!login_result)
+			 strcpy(msg1, "login successed!\n");
+		 else
+			 strcpy(msg1, "login failed...\n");
     
-	 sprintf(msg2, "Result of calculation is %d", calc_result);
+		 sprintf(msg2, "Result of calculation is %d", calc_result);
 
-	 char *msg = malloc(strlen(msg1) + strlen(msg2) + 3);
+		 char *msg = malloc(strlen(msg1) + strlen(msg2) + 3);
 
-	 sprintf(msg, "%s%s", msg1, msg2);
+		 sprintf(msg, "%s%s", msg1, msg2);
 
-	 write(clnt_sock, msg, strlen(msg)+3);
+	 	write(clnt_sock, msg, strlen(msg)+3);
     
-    close(clnt_sock);
-    close(serv_sock);
-    unlink(SOCK_PATH);
+	    close(clnt_sock);
+	 }
+	    
+	 close(serv_sock);
+	 unlink(SOCK_PATH);
 
     return 0;
 }
