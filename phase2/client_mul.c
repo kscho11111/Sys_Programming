@@ -1,4 +1,4 @@
-// client_add.c 21011723 조경수
+// client_mul.c 21011723 조경수
 
 #include <stdio.h>
 #include <stdlib.h>

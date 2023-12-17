@@ -1,3 +1,5 @@
+// clinet.c 21011723 조경수
+
 #include <stdio.h>
 #include <sys/socket.h>
 #include <sys/un.h>

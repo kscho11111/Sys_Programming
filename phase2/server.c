@@ -1,3 +1,5 @@
+// server.c 21011723 조경수
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
