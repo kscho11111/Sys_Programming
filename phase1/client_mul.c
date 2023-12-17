@@ -1,4 +1,5 @@
-//client_mul.c 21011723 조경수
+// client_add.c 21011723 조경수
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -32,15 +33,13 @@ void *send_and_receive(void *arg) {  // 서버로부터 메시지를 보내고 �
 
     sprintf(buffer, "%s %d %d", name, num1, num2);  // 버퍼에 이름, 첫 번째 숫자, 두 번째 숫자를 저장
     n = write(sockfd, buffer, strlen(buffer));  // 버퍼의 내용을 서버로 전송
-    
     if (n < 0) 
-        error("ERROR writing to socket"); // 에러 메시지 출력
+        error("ERROR writing to socket");
 
     bzero(buffer, BUFFER_SIZE);  // 버퍼 초기화
     n = read(sockfd, buffer, BUFFER_SIZE - 1);  // 서버로부터 메시지를 받음
-    
     if (n < 0) 
-        error("ERROR reading from socket"); // 에러 메시지 출력
+        error("ERROR reading from socket");
 
     printf("Result: %s\n", buffer);  // 결과 출력
     return NULL;
@@ -75,20 +74,8 @@ int main(int argc, char *argv[]) {
     if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)  // 서버에 연결
         error("ERROR connecting");
 
-    pthread_t thread1, thread2;  // 스레드 두 개 생성
-
-    if(strcmp(argv[0], "./client_mul") == 0)  // argv[0]이 "./client_mul"이면 스레드2 실행
-    {
-        pthread_create(&thread2, NULL, send_and_receive, &sockfd);
-        pthread_join(thread2, NULL);
-    }
-
-    else{  // 그 외의 경우에는 스레드1 실행
-        pthread_create(&thread1, NULL, send_and_receive, &sockfd);
-        pthread_join(thread1, NULL);
-    }
+	 send_and_receive(&sockfd);
 
     close(sockfd);  // 소켓 닫기
     return 0;
 }
-

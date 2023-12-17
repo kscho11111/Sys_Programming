@@ -1,4 +1,4 @@
-//server.c 21011723 조경수
+/server.c 21011723 조경수
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,6 +20,11 @@ typedef struct {  // Client 구조체 정의
 Client clients[10];  // 최대 10개의 Client를 저장하는 배열
 int num_clients = 0;  // 현재 연결된 클라이언트 수를 저장
 
+typedef struct {
+    int a;
+    int b;
+} numbers;
+
 void add_client(int sockfd, char* name) {  // 새 클라이언트 추가 함수
     clients[num_clients].sockfd = sockfd;  // 소켓 파일 디스크립터 저장
     strcpy(clients[num_clients].name, name);  // 이름 복사
@@ -31,6 +36,28 @@ void print_clients() {  // 현재 연결된 클라이언트의 정보 출력
     for (int i = 0; i < num_clients; i++) {
         printf("client :: %s", clients[i].name);
     }
+}
+
+void* add_thread(void* arg) {
+    numbers* nums = (numbers*)arg;
+    int result = nums->a + nums->b;
+    
+	 printf("First input is : %d\n", nums->a);
+	 printf("Second input is : %d\n", nums->b);
+	 printf("Result!: %d\n", result);
+	    
+	 return (void*)(intptr_t)result;
+}
+
+void* mul_thread(void* arg){
+	numbers* nums = (numbers*)arg;
+	int result = nums->a * nums->b;
+
+	printf("First input is : %d\n", nums->a);
+	printf("Second input is : %d\n", nums->b);
+	printf("Result: %d\n", result);
+
+	return (void*)(intptr_t)result;
 }
 
 void error(const char *msg) {  // 오류 메시지 출력 후 프로그램 종료 함수
@@ -73,15 +100,31 @@ int main() {
         int num1, num2, result;
         char name[100];
         sscanf(buffer, "%s %d %d", name,  &num1, &num2);  // 메시지에서 이름, 두 숫자를 가져옴
-        
+        numbers nums = {0,0};
+		  nums.a = num1;
+		  nums.b = num2;
+
         add_client(newsockfd, name);  // 새 클라이언트 추가
             
         if(strcmp(clients[num_clients-1].name, "./client_add") == 0){  // 클라이언트 이름이 "./client_add"이면
-            result = num1 + num2;  // 두 숫자를 더함
-				printf("First input is : %d\n", num1);
-				printf("Second input is : %d\n", num2);
-				printf("Output is : %d\n", result);
-        }
+				pthread_t thread_add;
+
+				if (pthread_create(&thread_add, NULL, add_thread, &nums) != 0) {
+					perror("Failed to create thread");
+					return -1;
+				}
+
+				void* status;
+				pthread_join(thread_add, &status);  // 스레드가 끝날 때까지 기다린 후, 반환값을 status에 저장
+
+				int result = (int)(intptr_t)status;  // 반환값을 int 타입으로 변환
+				//printf("Result: %d\n", result);
+				
+				sprintf(buffer, "%d", result);
+				buffer[strlen(buffer)] = NULL;
+				n = write(newsockfd, buffer, strlen(buffer)+1);
+				printf("\n%d\n", strlen(buffer));
+		  }
 
         if(strcmp(clients[num_clients-1].name, "./client_mul") == 0){  // 클라이언트 이름이 "./client_mul"이면
             result = num1 * num2;  // 두 숫자를 곱함
