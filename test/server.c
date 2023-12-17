@@ -74,22 +74,21 @@ int main()
 	 pthread_join(calc_thread, &thread_return);
     calc_result = (int)(intptr_t)thread_return;
 
-	 //printf("login res : %d, calcul res : %d\n", login_result, calc_result);
-    char msg1[50], msg2[50];
+	 char msg1[50], msg2[50];
     
 	 if(!login_result)
-		 strcpy(msg1, "login successed!");
+		 strcpy(msg1, "login successed!\n");
 	 else
-		 strcpy(msg1, "login failed...");
+		 strcpy(msg1, "login failed...\n");
     
 	 sprintf(msg2, "Result of calculation is %d", calc_result);
 
-	 //printf("%s\n%s\n", msg1, msg2);
+	 char *msg = malloc(strlen(msg1) + strlen(msg2) + 3);
 
-    write(clnt_sock, msg1, strlen(msg1)+1);
-    write(clnt_sock, msg2, strlen(msg2)+1);
-    write(clnt_sock, msg1, strlen(msg1)+1);
+	 sprintf(msg, "%s%s", msg1, msg2);
 
+	 write(clnt_sock, msg, strlen(msg)+3);
+    
     close(clnt_sock);
     close(serv_sock);
     unlink(SOCK_PATH);

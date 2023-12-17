@@ -18,8 +18,8 @@ int main()
     int sock;
     struct sockaddr_un serv_adr;
     char buf[100] = "Hello, UNIX Domain Socket!";
-	 char* msg1 = malloc(sizeof(char) * 50);
-	 char* msg2 = malloc(sizeof(char) * 50);
+	 //char* msg1 = malloc(sizeof(char) * 50);
+	 //char* msg2 = malloc(sizeof(char) * 50);
 
 	 ClientInfo client_info;
     sock = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -46,17 +46,11 @@ int main()
 
 	 write(sock, &client_info, sizeof(ClientInfo));
 
-	 read(sock, msg1, 50);
-    read(sock, msg2, 50);
+	 char *msg = malloc(100);
+	 read(sock, msg, 100);
 	 
-	 //read(sock, msg1, sizeof(msg1));
-	 //read(sock, msg2, sizeof(msg2));
-
-	 printf("%s\n", msg1);
-	 printf("%s\n", msg2);
-	 //printf("%s %d\n", msg1, sizeof(msg1));
-	 //printf("%s %d\n", msg2, sizeof(msg2));
-
+	 printf("%s\n", msg);
+	 
     close(sock);
 
     return 0;
