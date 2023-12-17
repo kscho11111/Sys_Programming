@@ -17,11 +17,7 @@ int main()
 {
     int sock;
     struct sockaddr_un serv_adr;
-    char buf[100] = "Hello, UNIX Domain Socket!";
-	 //char* msg1 = malloc(sizeof(char) * 50);
-	 //char* msg2 = malloc(sizeof(char) * 50);
-
-	 ClientInfo client_info;
+    ClientInfo client_info;
     sock = socket(AF_UNIX, SOCK_STREAM, 0);
 
     memset(&serv_adr, 0, sizeof(serv_adr));
